@@ -1,16 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-
-type Item = {
-  name: string;
-  price: number;
-  id: string;
-};
+import { BasketItem } from "../types";
 
 export type BasketState = {
   totalAmount: number;
   //TODO: This should probably be a map. I have to look into how to model this correctly.
-  items: Item[];
+  items: BasketItem[];
 };
 
 const initialState: BasketState = {
@@ -22,13 +17,17 @@ export const basketSlice = createSlice({
   name: "basket",
   initialState,
   reducers: {
-    addItem: (state, action: PayloadAction<Item>) => {
+    addItem: (state, action: PayloadAction<BasketItem>) => {
       state.totalAmount = state.totalAmount + action.payload.price;
       state.items = [...state.items, action.payload];
+    },
+    clearBasket: (state) => {
+      state.items = [];
+      state.totalAmount = 0;
     },
   },
 });
 
-export const { addItem } = basketSlice.actions;
+export const { addItem, clearBasket } = basketSlice.actions;
 
 export default basketSlice.reducer;

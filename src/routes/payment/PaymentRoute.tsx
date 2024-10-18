@@ -2,12 +2,14 @@ import { useSearchParams } from "react-router-dom";
 import { PaymentRequest } from "@cashu/cashu-ts";
 import { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
+import usePayment from "./hooks/usePayment";
 
 function PaymentRoute() {
   const [searchParams] = useSearchParams();
   const [error, setError] = useState("");
   const [paymentRequest, setPaymentRequest] = useState<PaymentRequest>();
   const encodedPaymentRequest = searchParams.get("pr");
+  const { isPaid, error: paymentError } = usePayment(paymentRequest);
 
   useEffect(() => {
     if (!encodedPaymentRequest) {
@@ -39,8 +41,19 @@ function PaymentRoute() {
         <div className="bg-zinc-200 flex flex-col gap-2 items-center p-4 rounded">
           <p className="font-bold">Please pay {paymentRequest.amount} SATS</p>
           <div className="bg-zinc-100 p-2 rounded">
-            <QRCode value={paymentRequest.toEncodedRequest()} />
+            {isPaid ? (
+              <p>Order was paid</p>
+            ) : (
+              <QRCode value={paymentRequest.toEncodedRequest()} />
+            )}
           </div>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(paymentRequest.toEncodedRequest());
+            }}
+          >
+            Copy Request
+          </button>
           <p className="animate-pulse text-xs">Awaiting payment</p>
         </div>
       </main>

@@ -12,6 +12,7 @@ import {
   REGISTER,
   REHYDRATE,
 } from "redux-persist";
+import productsReducer from "./products";
 
 const persistsConfig = {
   key: "root",
@@ -19,7 +20,10 @@ const persistsConfig = {
   storage,
 };
 
-const rootReducer = combineReducers({ basket: basketReducer });
+const rootReducer = combineReducers({
+  basket: basketReducer,
+  products: productsReducer,
+});
 const persistedReducer = persistReducer(persistsConfig, rootReducer);
 
 export const store = configureStore({

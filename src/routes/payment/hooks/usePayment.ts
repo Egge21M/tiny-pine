@@ -1,23 +1,25 @@
 import { PaymentRequest, PaymentRequestTransportType } from "@cashu/cashu-ts";
 import { useEffect, useState } from "react";
 import { SubCloser } from "nostr-tools/abstract-pool";
-import { Event, nip04 } from "nostr-tools";
-import { getSecretKey, pool } from "../../../utils/nostr";
+import { Event, getPublicKey, kinds, nip44 } from "nostr-tools";
+import { getSecretKey, pool, relays } from "../../../utils/nostr";
+import { unwrapEvent } from "nostr-tools/nip59";
 
-const usePayment = (paymentRequest: PaymentRequest) => {
+const usePayment = (paymentRequest?: PaymentRequest) => {
   const [isPaid, setIsPaid] = useState(false);
   const [error, setError] = useState("");
-  const sk = getSecretKey();
 
   async function eventHandler(e: Event) {
-    if (e.kind === 4) {
-      const decrypted = await nip04.decrypt(sk, e.pubkey, e.content);
-      try {
-        const payload = JSON.parse(decrypted);
-        console.log(payload);
-      } catch (e) {
-        console.log(e);
-      }
+    console.log("Received an event...");
+    if (e.kind === 1059) {
+      const paymentPayloadEvent = (await unwrapEvent(
+        e,
+        getSecretKey(),
+      )) as Event;
+      console.log("unwrapped: ", paymentPayloadEvent);
+      console.log("Received PROOFS!");
+      console.log(paymentPayloadEvent);
+      setIsPaid(true);
     }
   }
 
@@ -26,16 +28,27 @@ const usePayment = (paymentRequest: PaymentRequest) => {
     if (paymentRequest) {
       if (
         !paymentRequest.transport.find(
-          (t) => t.target === PaymentRequestTransportType.NOSTR,
+          (t) => t.type === PaymentRequestTransportType.NOSTR,
         )
       ) {
         setError("non nostr payment requests are not supported");
         return;
       }
-      sub = pool.subscribeMany([], [], { onevent: eventHandler });
+      console.log("Setup subscription");
+      const filters = [
+        {
+          kinds: [1059],
+          "#p": [getPublicKey(getSecretKey())],
+          since: Math.floor(Date.now() / 1000),
+        },
+      ];
+      sub = pool.subscribeMany(relays, filters, {
+        onevent: eventHandler,
+      });
     }
     return () => {
       if (sub) {
+        console.log("Closed sub...");
         sub.close();
       }
     };

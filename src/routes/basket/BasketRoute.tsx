@@ -3,11 +3,14 @@ import { useAppSelector } from "../../store/store";
 import { PaymentRequest, PaymentRequestTransportType } from "@cashu/cashu-ts";
 import { useNavigate } from "react-router-dom";
 import { getNProfile } from "../../utils/nostr";
+import { clearBasket } from "../../store/basket";
+import { useDispatch } from "react-redux";
+import Button from "../../components/Button";
 
 function BasketRoute() {
   const items = useAppSelector((state) => state.basket.items);
   const totalAmount = useAppSelector((state) => state.basket.totalAmount);
-  const structuorangeItems = useMemo(() => {
+  const structuredItems = useMemo(() => {
     const map: { [itemId: string]: { item: any; qnt: number } } = {};
     items.forEach((i) => {
       if (map[i.id]) {
@@ -17,9 +20,10 @@ function BasketRoute() {
       }
     });
     return map;
-  }, items);
+  }, [items]);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   function checkoutHandler() {
     const pr = new PaymentRequest(
@@ -27,40 +31,43 @@ function BasketRoute() {
         {
           type: PaymentRequestTransportType.NOSTR,
           target: getNProfile(),
-          tags: [["m", "NIP-04"]],
+          tags: [["m", "NIP-17"]],
         },
       ],
       window.crypto.randomUUID(),
       totalAmount,
       "sat",
-      ["https://mint.minibits.cash/Bitcoin"],
+      ["https://nofees.testnut.cashu.space"],
       "tiny-pine",
     );
     navigate(`/payment?pr=${pr.toEncodedRequest()}`);
   }
   return (
-    <main className="bg-zinc-100 grow p-4">
+    <main className="bg-zinc-100 grow flex flex-col gap-4 p-4">
       <h1>Basket</h1>
-      <div className="flex flex-col">
-        {Object.keys(structuorangeItems).map((id) => (
+      <div className="flex flex-col gap-1 max-w-sm">
+        {Object.keys(structuredItems).map((id) => (
           <div className="bg-zinc-200 flex p-2 rounded justify-between text-black">
             <div className="flex gap-2">
-              <p>{structuorangeItems[id].qnt}x</p>
-              <p>{structuorangeItems[id].item.name}</p>
+              <p>{structuredItems[id].qnt}x</p>
+              <p>{structuredItems[id].item.name}</p>
             </div>
             <p>
-              {structuorangeItems[id].qnt * structuorangeItems[id].item.price} SATS
+              {structuredItems[id].qnt * structuredItems[id].item.price} SATS
             </p>
           </div>
         ))}
       </div>
       <p className="text-xs">Total: {totalAmount} SATS</p>
-      <button
-        className="bg-zinc-300 px-2 py-1 rounded"
-        onClick={checkoutHandler}
-      >
-        Checkout
-      </button>
+      <div className="flex gap-2">
+        <Button title="Checkout" onClick={checkoutHandler} />
+        <Button
+          title="Clear Basket"
+          onClick={() => {
+            dispatch(clearBasket());
+          }}
+        />
+      </div>
     </main>
   );
 }

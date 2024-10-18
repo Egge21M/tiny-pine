@@ -5,6 +5,8 @@ import {
   SimplePool,
 } from "nostr-tools";
 
+export const relays = ["wss://nostr-pub.wellorder.net"];
+
 export const pool = new SimplePool();
 
 export function getSecretKey() {
@@ -23,6 +25,5 @@ export function getNProfile() {
   console.log(sk);
   const pk = getPublicKey(getSecretKey());
   //TODO: This should be configurable
-  const relays = ["wss://relay.damus.io"];
   return nip19.nprofileEncode({ pubkey: pk, relays });
 }
