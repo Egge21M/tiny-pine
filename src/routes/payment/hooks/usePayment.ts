@@ -1,7 +1,7 @@
 import { PaymentRequest, PaymentRequestTransportType } from "@cashu/cashu-ts";
 import { useEffect, useState } from "react";
 import { SubCloser } from "nostr-tools/abstract-pool";
-import { Event, getPublicKey, kinds, nip44 } from "nostr-tools";
+import { Event, getPublicKey } from "nostr-tools";
 import { getSecretKey, pool, relays } from "../../../utils/nostr";
 import { unwrapEvent } from "nostr-tools/nip59";
 

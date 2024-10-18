@@ -1,8 +1,6 @@
-import React from "react";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import { addItem } from "../../store/basket";
+import { useAppSelector } from "../../store/store";
 import ProductCard from "./ProductCard";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import AddProductModal from "./AddProductModal";
 
 function ProductRoute() {

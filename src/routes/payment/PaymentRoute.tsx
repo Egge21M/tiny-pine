@@ -9,7 +9,7 @@ function PaymentRoute() {
   const [error, setError] = useState("");
   const [paymentRequest, setPaymentRequest] = useState<PaymentRequest>();
   const encodedPaymentRequest = searchParams.get("pr");
-  const { isPaid, error: paymentError } = usePayment(paymentRequest);
+  const { isPaid } = usePayment(paymentRequest);
 
   useEffect(() => {
     if (!encodedPaymentRequest) {
