@@ -3,9 +3,8 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootRoute from "./routes/RootRoute.tsx";
 import { Provider } from "react-redux";
-import { persistor, store } from "./store/store.ts";
+import { store } from "./store/store.ts";
 import ProductRoute from "./routes/product/ProductRoute.tsx";
-import { PersistGate } from "redux-persist/integration/react";
 import BasketRoute from "./routes/basket/BasketRoute.tsx";
 import PaymentRoute from "./routes/payment/PaymentRoute.tsx";
 
@@ -23,8 +22,6 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
-    <PersistGate persistor={persistor}>
-      <RouterProvider router={router} />,
-    </PersistGate>
+    <RouterProvider router={router} />,
   </Provider>,
 );

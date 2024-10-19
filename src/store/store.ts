@@ -1,42 +1,17 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import basketReducer from "./basket";
 import { useDispatch, useSelector } from "react-redux";
-import storage from "redux-persist/lib/storage";
-import persistReducer from "redux-persist/es/persistReducer";
-import {
-  FLUSH,
-  PAUSE,
-  PERSIST,
-  persistStore,
-  PURGE,
-  REGISTER,
-  REHYDRATE,
-} from "redux-persist";
 import productsReducer from "./products";
-
-const persistsConfig = {
-  key: "root",
-  version: 1,
-  storage,
-};
-
-const rootReducer = combineReducers({
-  basket: basketReducer,
-  products: productsReducer,
-});
-const persistedReducer = persistReducer(persistsConfig, rootReducer);
+import listener from "./middleware";
 
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: {
+    basket: basketReducer,
+    products: productsReducer,
+  },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
+    getDefaultMiddleware().prepend(listener.middleware),
 });
-
-export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
