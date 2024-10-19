@@ -14,16 +14,17 @@ export const productsSlice = createSlice({
   initialState,
   reducers: {
     addItem: (state, action: PayloadAction<Item>) => {
-      console.log("received");
-      console.log(action.payload);
       if (state.products[action.payload.id]) {
         return;
       }
       state.products[action.payload.id] = action.payload;
     },
+    rehydrate: (state, action: PayloadAction<ProductsState>) => {
+      state.products = action.payload.products;
+    },
   },
 });
 
-export const { addItem } = productsSlice.actions;
+export const { addItem, rehydrate } = productsSlice.actions;
 
 export default productsSlice.reducer;
