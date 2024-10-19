@@ -12,7 +12,7 @@ const appStartListening = listener.startListening.withTypes<
 
 appStartListening({
   actionCreator: addItem,
-  effect: async (action, listenerApi) => {
+  effect: async (_, listenerApi) => {
     const productState = listenerApi.getState().products;
     await persistAppData(productState, "pine-products");
   },
