@@ -13,7 +13,7 @@ function ProductCard({ item }: ProductCardProps) {
       onClick={() => {
         dispatch(addItem({ name: item.name, price: item.price, id: item.id }));
       }}
-      className="flex flex-col rounded bg-zinc-200 p-2 gap-2"
+      className="flex flex-col bg-zinc-50 rounded hover:shadow-xl transition shadow-md p-2 gap-2"
     >
       {item.imageUrl ? (
         <img className="h-32 object-cover rounded" src={item.imageUrl} />
