@@ -29,19 +29,18 @@ const sub = pool.subscribeMany(
   [{ kinds: [30078], authors: [getPublicKey(getSecretKey())] }],
   {
     onevent: (e) => {
-      console.log(e);
       const dTag = e.tags.find((t) => t[0] === "d");
-      console.log(dTag);
       if (dTag && dTag[1] === "pine-products") {
-        console.log("runs");
         const payload = nip44.decrypt(
           e.content,
           getConversationKey(getSecretKey(), getPublicKey(getSecretKey())),
         );
         const parsed = JSON.parse(payload);
-        console.log(parsed);
         store.dispatch(rehydrate(parsed));
       }
+    },
+    oneose: () => {
+      sub.close();
     },
   },
 );
