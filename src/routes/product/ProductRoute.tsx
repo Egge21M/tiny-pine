@@ -13,7 +13,7 @@ function ProductRoute() {
   const productsList = Object.keys(products);
   const [activeTab, setActiveTab] = useState("All");
   return (
-    <main className="grow bg-zinc-100 p-4 flex flex-col gap-4">
+    <main className="grow bg-zinc-50 p-4 flex flex-col gap-4">
       <div className="flex justify-between">
         <h1>Products</h1>
         <button

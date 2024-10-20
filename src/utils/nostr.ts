@@ -1,7 +1,6 @@
 import {
   EventTemplate,
   finalizeEvent,
-  generateSecretKey,
   getPublicKey,
   nip19,
   nip44,
@@ -13,15 +12,14 @@ export const relays = ["wss://nostr-pub.wellorder.net"];
 
 export const pool = new SimplePool();
 
+let key: Uint8Array;
+
+export function setSecretKey(sk: Uint8Array) {
+  key = sk;
+}
+
 export function getSecretKey() {
-  //TODO: Encrypt secret key / derive from words
-  const storedKey = localStorage.getItem("tiny-sk");
-  if (!storedKey) {
-    const newKey = generateSecretKey();
-    localStorage.setItem("tiny-sk", JSON.stringify(Array.from(newKey)));
-    return newKey;
-  }
-  return new Uint8Array(JSON.parse(storedKey));
+  return key;
 }
 
 export function getNProfile() {
