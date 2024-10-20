@@ -1,8 +1,12 @@
-import { PaymentRequest, PaymentRequestTransportType } from "@cashu/cashu-ts";
+import {
+  PaymentRequest,
+  PaymentRequestPayload,
+  PaymentRequestTransportType,
+} from "@cashu/cashu-ts";
 import { useEffect, useState } from "react";
 import { SubCloser } from "nostr-tools/abstract-pool";
 import { Event, getPublicKey } from "nostr-tools";
-import { getSecretKey, pool, relays } from "../../../utils/nostr";
+import { getSecretKey, pool, relays, sackProofs } from "../../../utils/nostr";
 import { unwrapEvent } from "nostr-tools/nip59";
 
 const usePayment = (paymentRequest?: PaymentRequest) => {
@@ -17,8 +21,17 @@ const usePayment = (paymentRequest?: PaymentRequest) => {
         getSecretKey(),
       )) as Event;
       console.log("unwrapped: ", paymentPayloadEvent);
-      console.log("Received PROOFS!");
-      console.log(paymentPayloadEvent);
+      const parsedPayment = JSON.parse(
+        paymentPayloadEvent.content,
+      ) as PaymentRequestPayload;
+      const amount = parsedPayment.proofs.reduce((a, c) => a + c.amount, 0);
+      if (
+        paymentRequest!.id !== parsedPayment.id ||
+        paymentRequest!.amount! > amount
+      ) {
+        throw new Error("Invalid payment payload");
+      }
+      await sackProofs(parsedPayment.mint, parsedPayment.proofs);
       setIsPaid(true);
     }
   }

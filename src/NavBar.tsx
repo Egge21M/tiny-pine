@@ -11,6 +11,7 @@ function NavBar() {
         <p className="font-bold text-xl">TINYPINE</p>
       </div>
       <div className="flex gap-2 items-center">
+        <Link to="/wallet">Wallet</Link>
         <Link to="/">Items</Link>
         <Link to={"/basket"} className="flex gap-1 rounded px-2 py-1">
           <p className="px-2 py-1 border-zinc-100 border-[1px] rounded">

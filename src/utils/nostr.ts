@@ -1,3 +1,4 @@
+import { Proof } from "@cashu/cashu-ts";
 import {
   EventTemplate,
   finalizeEvent,
@@ -22,12 +23,30 @@ export function getSecretKey() {
   return key;
 }
 
+export function getPersonalConvKey() {
+  return nip44.getConversationKey(getSecretKey(), getPublicKey(getSecretKey()));
+}
+
 export function getNProfile() {
   const sk = getSecretKey();
   console.log(sk);
   const pk = getPublicKey(getSecretKey());
   //TODO: This should be configurable
   return nip19.nprofileEncode({ pubkey: pk, relays });
+}
+
+export function sackProofs(mintUrl: string, proofs: Proof[]) {
+  const temp: EventTemplate = {
+    created_at: Math.floor(Date.now() / 1000),
+    kind: 7375,
+    tags: [[]],
+    content: nip44.encrypt(
+      JSON.stringify({ mint: mintUrl, proofs }),
+      getPersonalConvKey(),
+    ),
+  };
+  const event = finalizeEvent(temp, getSecretKey());
+  return Promise.allSettled(pool.publish(relays, event));
 }
 
 export async function persistAppData(appData: any, tag: string) {

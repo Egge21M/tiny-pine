@@ -10,9 +10,10 @@ import { getSecretKey, pool, relays, setSecretKey } from "./utils/nostr";
 import Button from "./components/Button";
 import { getPublicKey, nip44 } from "nostr-tools";
 import { getConversationKey } from "nostr-tools/nip44";
-import { store, useAppDispatch } from "./store/store";
+import { useAppDispatch } from "./store/store";
 import { rehydrate } from "./store/products";
 import { SubCloser } from "nostr-tools/abstract-pool";
+import WalletRoute from "./routes/wallet/WalletRoute";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       { path: "/", element: <ProductRoute /> },
       { path: "/basket", element: <BasketRoute /> },
       { path: "/payment", element: <PaymentRoute /> },
+      { path: "/wallet", element: <WalletRoute /> },
     ],
   },
 ]);
