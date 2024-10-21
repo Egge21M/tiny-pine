@@ -1,9 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootRoute from "./routes/RootRoute";
-import ProductRoute from "./routes/product/ProductRoute";
-import BasketRoute from "./routes/basket/BasketRoute";
-import PaymentRoute from "./routes/payment/PaymentRoute";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { privateKeyFromSeedWords } from "nostr-tools/nip06";
 import { hexToBytes } from "@noble/hashes/utils";
 import { getSecretKey, pool, relays, setSecretKey } from "./utils/nostr";
@@ -12,9 +9,13 @@ import { getConversationKey } from "nostr-tools/nip44";
 import { useAppDispatch } from "./store/store";
 import { rehydrate } from "./store/products";
 import { SubCloser } from "nostr-tools/abstract-pool";
-import WalletRoute from "./routes/wallet/WalletRoute";
-import Setup from "./routes/setup/SetupRoute";
-import SettingsRoute from "./routes/settings/SettingsRoute";
+
+const WalletRoute = lazy(() => import("./routes/wallet/WalletRoute"));
+const ProductRoute = lazy(() => import("./routes/product/ProductRoute"));
+const PaymentRoute = lazy(() => import("./routes/payment/PaymentRoute"));
+const BasketRoute = lazy(() => import("./routes/basket/BasketRoute"));
+const Setup = lazy(() => import("./routes/setup/SetupRoute"));
+const SettingsRoute = lazy(() => import("./routes/settings/SettingsRoute"));
 
 const router = createBrowserRouter([
   {
@@ -86,7 +87,11 @@ function Router() {
     return null;
   }
   if (isSetup) {
-    return <RouterProvider router={router} />;
+    return (
+      <Suspense fallback={<p>Loading...</p>}>
+        <RouterProvider router={router} />;
+      </Suspense>
+    );
   }
   return <Setup setIsSetup={setIsSetup} />;
 }
