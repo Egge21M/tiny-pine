@@ -3,6 +3,8 @@ import { PaymentRequest } from "@cashu/cashu-ts";
 import { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import usePayment from "./hooks/usePayment";
+import Confetti from "react-confetti";
+import { FaCheckCircle } from "react-icons/fa";
 
 function PaymentRoute() {
   const [searchParams] = useSearchParams();
@@ -39,16 +41,23 @@ function PaymentRoute() {
     );
   }
   if (paymentRequest) {
+    if (isPaid) {
+      return (
+        <main className="grow flex justify-center items-center">
+          <div className="bg-zinc-100 shadow p-4 rounded flex flex-col items-center">
+            <FaCheckCircle className="text-7xl text-emerald-600" />
+            <p>Order was paid</p>
+          </div>
+          <Confetti recycle={false} />
+        </main>
+      );
+    }
     return (
       <main className="bg-zinc-100 grow flex flex-col justify-center items-center">
         <div className="bg-zinc-200 flex flex-col gap-2 items-center p-4 rounded">
           <p className="font-bold">Please pay {paymentRequest.amount} SATS</p>
           <div className="bg-zinc-100 p-2 rounded">
-            {isPaid ? (
-              <p>Order was paid</p>
-            ) : (
-              <QRCode value={paymentRequest.toEncodedRequest()} />
-            )}
+            <QRCode value={paymentRequest.toEncodedRequest()} />
           </div>
           <button
             onClick={() => {
