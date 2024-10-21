@@ -1,4 +1,9 @@
-import { PaymentRequestPayload, Proof } from "@cashu/cashu-ts";
+import {
+  CashuMint,
+  CashuWallet,
+  PaymentRequestPayload,
+  Proof,
+} from "@cashu/cashu-ts";
 import {
   EventTemplate,
   finalizeEvent,
@@ -74,13 +79,19 @@ export function unwrapPaymentRequestPayload(e: Event) {
   }
 }
 
-export function sackProofs(mintUrl: string, proofs: Proof[]) {
+export async function sackProofs(mintUrl: string, proofs: Proof[]) {
+  const mint = new CashuMint(mintUrl);
+  const wallet = new CashuWallet(mint);
+  const newProofs = await wallet.receive({
+    token: [{ mint: mintUrl, proofs }],
+  });
+
   const temp: EventTemplate = {
     created_at: Math.floor(Date.now() / 1000),
     kind: 7375,
     tags: [[]],
     content: nip44.encrypt(
-      JSON.stringify({ mint: mintUrl, proofs }),
+      JSON.stringify({ mint: mintUrl, newProofs }),
       getPersonalConvKey(),
     ),
   };

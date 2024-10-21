@@ -7,28 +7,33 @@ import {
   sackProofs,
   unwrapPaymentRequestPayload,
 } from "../../../utils/nostr";
-import { validatePaymentRequestPayload } from "../../../utils/cashu";
+import { isValidPaymentRequestPayload } from "../../../utils/cashu";
+import { clearBasket } from "../../../store/basket";
+import { useDispatch } from "react-redux";
 
 const usePayment = (paymentRequest?: PaymentRequest) => {
   const [isPaid, setIsPaid] = useState(false);
-  const [error, setError] = useState("");
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     let sub: SubCloser;
+    console.log(paymentRequest);
     if (paymentRequest) {
-      try {
-        async function eventHandler(e: Event) {
-          const parsedPayment = unwrapPaymentRequestPayload(e);
-          validatePaymentRequestPayload(parsedPayment, paymentRequest!);
-          await sackProofs(parsedPayment.mint, parsedPayment.proofs);
-          setIsPaid(true);
+      async function eventHandler(e: Event) {
+        const parsedPayment = unwrapPaymentRequestPayload(e);
+        const isValid = isValidPaymentRequestPayload(
+          parsedPayment,
+          paymentRequest!,
+        );
+        if (!isValid) {
+          return;
         }
-        sub = createPaymentSubscription(eventHandler);
-      } catch (e) {
-        if (e instanceof Error) {
-          setError(e.message);
-        }
+        await sackProofs(parsedPayment.mint, parsedPayment.proofs);
+        setIsPaid(true);
+        dispatch(clearBasket());
       }
+      sub = createPaymentSubscription(eventHandler);
     }
     return () => {
       if (sub) {
@@ -36,7 +41,7 @@ const usePayment = (paymentRequest?: PaymentRequest) => {
       }
     };
   }, [paymentRequest]);
-  return { isPaid, error };
+  return { isPaid };
 };
 
 export default usePayment;

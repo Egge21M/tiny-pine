@@ -86,6 +86,8 @@ function Router() {
   if (isLoading) {
     return null;
   }
+
+  //TODO: Add proper loading page
   if (isSetup) {
     return (
       <Suspense fallback={<p>Loading...</p>}>

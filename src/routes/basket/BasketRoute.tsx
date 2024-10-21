@@ -35,11 +35,10 @@ function BasketRoute() {
           tags: [["m", "NIP-17"]],
         },
       ],
-      undefined,
+      window.crypto.randomUUID(),
       totalAmount,
       "sat",
       ["https://nofees.testnut.cashu.space"],
-      window.crypto.randomUUID(),
     );
     navigate(`/payment?pr=${pr.toEncodedRequest()}`);
   }
