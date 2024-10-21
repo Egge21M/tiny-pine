@@ -13,8 +13,6 @@ function AddProduct() {
   const nameRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLInputElement>(null);
   const priceRef = useRef<HTMLInputElement>(null);
-  const urlRef = useRef<HTMLInputElement>(null);
-  const idRef = useRef<HTMLInputElement>(null);
 
   useStopScroll();
 
@@ -38,29 +36,16 @@ function AddProduct() {
           ref={priceRef}
           type="number"
         />
-        <input
-          className="p-2 bg-zinc-200 rounded"
-          placeholder="image url"
-          ref={urlRef}
-          type="url"
-        />
-        <input
-          className="p-2 bg-zinc-200 rounded"
-          placeholder="id"
-          ref={idRef}
-        />
       </div>
       <button
         onClick={() => {
           console.log(nameRef.current?.value);
           console.log(descRef.current?.value);
           console.log(priceRef.current?.valueAsNumber);
-          console.log(idRef.current?.value);
           if (
             nameRef.current?.value &&
             descRef.current?.value &&
-            priceRef.current?.valueAsNumber &&
-            idRef.current?.value
+            priceRef.current?.valueAsNumber
           ) {
             console.log("dispatching...");
             dispatch(
@@ -68,8 +53,7 @@ function AddProduct() {
                 name: nameRef.current.value,
                 description: descRef.current?.value,
                 price: priceRef.current.valueAsNumber,
-                id: idRef.current.value,
-                imageUrl: urlRef.current?.value || "",
+                id: window.crypto.randomUUID(),
               }),
             );
           }

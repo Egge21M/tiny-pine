@@ -1,7 +1,6 @@
 export type Item = {
   name: string;
   description: string;
-  imageUrl: string;
   price: number;
   id: string;
 };
