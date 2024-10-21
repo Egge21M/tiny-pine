@@ -6,12 +6,13 @@ import { getNProfile } from "../../utils/nostr";
 import { clearBasket } from "../../store/basket";
 import { useDispatch } from "react-redux";
 import Button from "../../components/Button";
+import { BasketItem } from "../../types";
 
 function BasketRoute() {
   const items = useAppSelector((state) => state.basket.items);
   const totalAmount = useAppSelector((state) => state.basket.totalAmount);
   const structuredItems = useMemo(() => {
-    const map: { [itemId: string]: { item: any; qnt: number } } = {};
+    const map: { [itemId: string]: { item: BasketItem; qnt: number } } = {};
     items.forEach((i) => {
       if (map[i.id]) {
         map[i.id].qnt++;
@@ -34,11 +35,11 @@ function BasketRoute() {
           tags: [["m", "NIP-17"]],
         },
       ],
-      window.crypto.randomUUID(),
+      undefined,
       totalAmount,
       "sat",
       ["https://nofees.testnut.cashu.space"],
-      "tiny-pine",
+      window.crypto.randomUUID(),
     );
     navigate(`/payment?pr=${pr.toEncodedRequest()}`);
   }
