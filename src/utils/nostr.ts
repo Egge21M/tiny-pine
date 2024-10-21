@@ -1,4 +1,4 @@
-import { Proof } from "@cashu/cashu-ts";
+import { PaymentRequestPayload, Proof } from "@cashu/cashu-ts";
 import {
   EventTemplate,
   finalizeEvent,
@@ -6,10 +6,17 @@ import {
   nip19,
   nip44,
   SimplePool,
+  Event,
 } from "nostr-tools";
 import { getConversationKey } from "nostr-tools/nip44";
+import { unwrapEvent } from "nostr-tools/nip59";
 
-export const relays = ["wss://nostr-pub.wellorder.net"];
+export const relays = [
+  "wss://nostr-pub.wellorder.net",
+  "wss://relay.8333.space",
+  "wss://nos.lol",
+  "wss://relay.damus.io",
+];
 
 export const pool = new SimplePool();
 
@@ -33,6 +40,38 @@ export function getNProfile() {
   const pk = getPublicKey(getSecretKey());
   //TODO: This should be configurable
   return nip19.nprofileEncode({ pubkey: pk, relays });
+}
+
+export function createPaymentSubscription(eventHandler: (e: Event) => void) {
+  const filters = [
+    {
+      kinds: [1059],
+      "#p": [getPublicKey(getSecretKey())],
+      since: Math.floor(Date.now() / 1000) - 172800,
+    },
+  ];
+  return pool.subscribeMany(relays, filters, {
+    onevent: eventHandler,
+  });
+}
+
+export function unwrapPaymentRequestPayload(e: Event) {
+  if (e.kind !== 1059) {
+    throw new Error("event is not a gift wrap");
+  }
+  try {
+    const paymentPayloadEvent = unwrapEvent(e, getSecretKey()) as Event;
+    const parsedPayment = JSON.parse(
+      paymentPayloadEvent.content,
+    ) as PaymentRequestPayload;
+    if (!parsedPayment.mint || !parsedPayment.proofs) {
+      throw new Error("event is not a payment request payload");
+    }
+    return parsedPayment;
+  } catch (e) {
+    console.error(e);
+    throw new Error("event is not a valid payment request");
+  }
 }
 
 export function sackProofs(mintUrl: string, proofs: Proof[]) {

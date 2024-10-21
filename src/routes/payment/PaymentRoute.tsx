@@ -11,6 +11,8 @@ function PaymentRoute() {
   const encodedPaymentRequest = searchParams.get("pr");
   const { isPaid } = usePayment(paymentRequest);
 
+  //TODO: Add animation and haptics
+
   useEffect(() => {
     if (!encodedPaymentRequest) {
       setError("No Payment Request provided");
@@ -19,6 +21,7 @@ function PaymentRoute() {
         const decoded = PaymentRequest.fromEncodedRequest(
           encodedPaymentRequest,
         );
+        console.log(decoded);
         setPaymentRequest(decoded);
       } catch (e) {
         if (e instanceof Error) {
