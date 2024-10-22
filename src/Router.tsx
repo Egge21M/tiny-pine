@@ -1,7 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootRoute from "./routes/RootRoute";
 import { lazy, Suspense, useEffect, useState } from "react";
-import { privateKeyFromSeedWords } from "nostr-tools/nip06";
 import { hexToBytes } from "@noble/hashes/utils";
 import { getSecretKey, pool, relays, setSecretKey } from "./utils/nostr";
 import { getPublicKey, nip44 } from "nostr-tools";
@@ -40,15 +39,19 @@ function Router() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const storedMnemonic = localStorage.getItem("tiny-mnem");
-    if (storedMnemonic) {
-      const parsed = JSON.parse(storedMnemonic);
-      const privateKey = privateKeyFromSeedWords(parsed.join(" "));
-      const bytes = hexToBytes(privateKey);
-      setSecretKey(bytes);
-      setIsSetup(true);
+    async function setup() {
+      const storedMnemonic = localStorage.getItem("tiny-mnem");
+      if (storedMnemonic) {
+        const { privateKeyFromSeedWords } = await import("nostr-tools/nip06");
+        const parsed = JSON.parse(storedMnemonic);
+        const privateKey = privateKeyFromSeedWords(parsed.join(" "));
+        const bytes = hexToBytes(privateKey);
+        setSecretKey(bytes);
+        setIsSetup(true);
+      }
+      setIsLoading(false);
     }
-    setIsLoading(false);
+    setup();
   }, []);
 
   useEffect(() => {

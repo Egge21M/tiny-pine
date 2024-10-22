@@ -1,5 +1,4 @@
 import { hexToBytes } from "@noble/hashes/utils";
-import { generateSeedWords, privateKeyFromSeedWords } from "nostr-tools/nip06";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { setSecretKey } from "../../utils/nostr";
 import Button from "../../components/Button";
@@ -64,7 +63,7 @@ function Setup({
           />
           <Button
             title="Confirm"
-            onClick={() => {
+            onClick={async () => {
               const mnemArr = [
                 word1.current?.value,
                 word2.current?.value,
@@ -79,6 +78,9 @@ function Setup({
                 word11.current?.value,
                 word12.current?.value,
               ];
+              const { privateKeyFromSeedWords } = await import(
+                "nostr-tools/nip06"
+              );
               const mnemString = JSON.stringify(mnemArr);
               localStorage.setItem("tiny-mnem", mnemString);
               const key = privateKeyFromSeedWords(mnemArr.join(" "));
@@ -101,7 +103,9 @@ function Setup({
         <div>
           <Button
             title="Start fresh"
-            onClick={() => {
+            onClick={async () => {
+              const { generateSeedWords, privateKeyFromSeedWords } =
+                await import("nostr-tools/nip06");
               const words = generateSeedWords();
               localStorage.setItem(
                 "tiny-mnem",
