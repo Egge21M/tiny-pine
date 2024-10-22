@@ -3,11 +3,13 @@ import basketReducer from "./basket";
 import { useDispatch, useSelector } from "react-redux";
 import productsReducer from "./products";
 import listener from "./middleware";
+import ordersReducer from "./ordersSlice";
 
 export const store = configureStore({
   reducer: {
     basket: basketReducer,
     products: productsReducer,
+    orders: ordersReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listener.middleware),

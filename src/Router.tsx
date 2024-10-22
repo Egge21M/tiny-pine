@@ -16,6 +16,7 @@ const PaymentRoute = lazy(() => import("./routes/payment/PaymentRoute"));
 const BasketRoute = lazy(() => import("./routes/basket/BasketRoute"));
 const Setup = lazy(() => import("./routes/setup/SetupRoute"));
 const SettingsRoute = lazy(() => import("./routes/settings/SettingsRoute"));
+const OrdersRoute = lazy(() => import("./routes/orders/OrdersRoute"));
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
       { path: "/", element: <ProductRoute /> },
       { path: "/basket", element: <BasketRoute /> },
       { path: "/payment", element: <PaymentRoute /> },
+      { path: "/orders", element: <OrdersRoute /> },
       { path: "/wallet", element: <WalletRoute /> },
       { path: "/settings", element: <SettingsRoute /> },
     ],

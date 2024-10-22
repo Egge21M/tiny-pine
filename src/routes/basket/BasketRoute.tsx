@@ -7,6 +7,9 @@ import { clearBasket } from "../../store/basket";
 import { useDispatch } from "react-redux";
 import Button from "../../components/Button";
 import { BasketItem } from "../../types";
+import { addOrder } from "../../store/ordersSlice";
+import useNextOrderId from "../../hooks/useNextOrderId";
+import { bytesToHex } from "@noble/hashes/utils";
 
 function BasketRoute() {
   const items = useAppSelector((state) => state.basket.items);
@@ -26,7 +29,13 @@ function BasketRoute() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const nextOrderId = useNextOrderId();
+  console.log(nextOrderId);
+
   function checkoutHandler() {
+    const paymentId = bytesToHex(
+      window.crypto.getRandomValues(new Uint8Array(16)),
+    );
     const pr = new PaymentRequest(
       [
         {
@@ -35,10 +44,19 @@ function BasketRoute() {
           tags: [["m", "NIP-17"]],
         },
       ],
-      window.crypto.randomUUID(),
+      paymentId,
       totalAmount,
       "sat",
       ["https://nofees.testnut.cashu.space"],
+    );
+    dispatch(
+      addOrder({
+        id: String(nextOrderId),
+        amount: totalAmount,
+        createdAt: Math.floor(Date.now() / 1000),
+        state: "UNPAID",
+        paymentId: paymentId,
+      }),
     );
     navigate(`/payment?pr=${pr.toEncodedRequest()}`);
   }
