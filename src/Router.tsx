@@ -20,15 +20,15 @@ const OrdersRoute = lazy(() => import("./routes/orders/OrdersRoute"));
 
 const router = createBrowserRouter([
   {
-    path: "",
+    path: "/",
     element: <RootRoute />,
     children: [
-      { path: "/", element: <ProductRoute /> },
-      { path: "/basket", element: <BasketRoute /> },
-      { path: "/payment", element: <PaymentRoute /> },
-      { path: "/orders", element: <OrdersRoute /> },
-      { path: "/wallet", element: <WalletRoute /> },
-      { path: "/settings", element: <SettingsRoute /> },
+      { path: "", element: <ProductRoute /> },
+      { path: "basket", element: <BasketRoute /> },
+      { path: "payment", element: <PaymentRoute /> },
+      { path: "orders", element: <OrdersRoute /> },
+      { path: "wallet", element: <WalletRoute /> },
+      { path: "settings", element: <SettingsRoute /> },
     ],
   },
 ]);
