@@ -53,10 +53,10 @@ function PaymentRoute() {
       );
     }
     return (
-      <main className="bg-zinc-100 grow flex flex-col justify-center items-center">
-        <div className="bg-zinc-200 flex flex-col gap-2 items-center p-4 rounded">
+      <main className="bg-zinc-50 grow flex flex-col justify-center items-center">
+        <div className="bg-zinc-100 shadow flex flex-col gap-2 items-center p-4 rounded">
           <p className="font-bold">Please pay {paymentRequest.amount} SATS</p>
-          <div className="bg-zinc-100 p-2 rounded">
+          <div className="bg-zinc-50 p-2 rounded">
             <QRCode value={paymentRequest.toEncodedRequest()} />
           </div>
           <button

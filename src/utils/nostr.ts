@@ -89,9 +89,9 @@ export async function sackProofs(mintUrl: string, proofs: Proof[]) {
   const temp: EventTemplate = {
     created_at: Math.floor(Date.now() / 1000),
     kind: 7375,
-    tags: [[]],
+    tags: [],
     content: nip44.encrypt(
-      JSON.stringify({ mint: mintUrl, newProofs }),
+      JSON.stringify({ mint: mintUrl, proofs: newProofs }),
       getPersonalConvKey(),
     ),
   };

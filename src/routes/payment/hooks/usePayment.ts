@@ -29,7 +29,8 @@ const usePayment = (paymentRequest?: PaymentRequest) => {
         if (!isValid) {
           return;
         }
-        await sackProofs(parsedPayment.mint, parsedPayment.proofs);
+        const res = await sackProofs(parsedPayment.mint, parsedPayment.proofs);
+        console.log(res);
         setIsPaid(true);
         dispatch(clearBasket());
       }
