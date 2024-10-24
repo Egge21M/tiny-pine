@@ -15,7 +15,7 @@ function ProductCard({ item }: ProductCardProps) {
       }}
       className="flex flex-col bg-zinc-50 rounded hover:shadow-xl transition shadow-md p-2 gap-2"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex w-full items-center justify-between">
         <div className="text-left">
           <p className="font-bold">{item.name}</p>
           <p className="text-xs">{item.description}</p>
