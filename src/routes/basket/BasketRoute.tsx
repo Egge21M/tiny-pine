@@ -1,13 +1,18 @@
 import { useMemo } from "react";
 import { useAppSelector } from "../../store/store";
-import { PaymentRequest, PaymentRequestTransportType } from "@cashu/cashu-ts";
+import {
+  CashuMint,
+  CashuWallet,
+  PaymentRequest,
+  PaymentRequestTransportType,
+} from "@cashu/cashu-ts";
 import { useNavigate } from "react-router-dom";
 import { getNProfile } from "../../utils/nostr";
 import { clearBasket } from "../../store/basket";
 import { useDispatch } from "react-redux";
 import Button from "../../components/Button";
 import { BasketItem } from "../../types";
-import { addOrder } from "../../store/ordersSlice";
+import { addOrder, setActiveOrder } from "../../store/ordersSlice";
 import useNextOrderId from "../../hooks/useNextOrderId";
 import { bytesToHex } from "@noble/hashes/utils";
 
@@ -32,7 +37,8 @@ function BasketRoute() {
   const nextOrderId = useNextOrderId();
   console.log(nextOrderId);
 
-  function checkoutHandler() {
+  async function checkoutHandler() {
+    const orderId = nextOrderId;
     const paymentId = bytesToHex(
       window.crypto.getRandomValues(new Uint8Array(16)),
     );
@@ -49,16 +55,27 @@ function BasketRoute() {
       "sat",
       ["https://nofees.testnut.cashu.space"],
     );
+    const wallet = new CashuWallet(
+      new CashuMint("https://nofees.testnut.cashu.space"),
+    );
+    const mint = await wallet.createMintQuote(totalAmount);
+    dispatch(
+      setActiveOrder({
+        orderId: String(orderId),
+        paymentRequest: pr,
+        lnFallback: { quoteId: mint.quote, lnPr: mint.request },
+      }),
+    );
     dispatch(
       addOrder({
-        id: String(nextOrderId),
+        id: String(orderId),
         amount: totalAmount,
         createdAt: Math.floor(Date.now() / 1000),
         state: "UNPAID",
         paymentId: paymentId,
       }),
     );
-    navigate(`/payment?pr=${pr.toEncodedRequest()}`);
+    navigate(`/payment`);
   }
   return (
     <main className="bg-zinc-100 grow flex flex-col gap-4 p-4">
