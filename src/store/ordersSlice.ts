@@ -9,7 +9,7 @@ export type OrdersState = {
   activeOrder?: {
     orderId: string;
     paymentRequest: PaymentRequest;
-    lnFallback?: {
+    lnFallback: {
       quoteId: string;
       lnPr: string;
     };
@@ -49,7 +49,7 @@ export const ordersSlice = createSlice({
       action: PayloadAction<{
         orderId: string;
         paymentRequest: PaymentRequest;
-        lnFallback?: { quoteId: string; lnPr: string };
+        lnFallback: { quoteId: string; lnPr: string };
       }>,
     ) => {
       state.activeOrder = action.payload;
