@@ -4,6 +4,8 @@ import { useSearchParams } from "react-router-dom";
 import AddProductModal from "./AddProductModal";
 import { useState } from "react";
 import OrderPreview from "./components/OrderPreview";
+import Button from "../../components/Button";
+import ProductListModal from "./ProductListModal";
 
 const tabs = ["All", "Food", "Drinks"];
 
@@ -19,13 +21,20 @@ function ProductRoute() {
         <div className="flex flex-col col-span-2 gap-2">
           <div className="flex justify-between">
             <h1>Products</h1>
-            <button
-              onClick={() => {
-                setSearchParams("action=add");
-              }}
-            >
-              + Add Product
-            </button>
+            <div className="flex gap-2">
+              <Button
+                title="Edit"
+                onClick={() => {
+                  setSearchParams("action=edit");
+                }}
+              />
+              <Button
+                title="+ Add Product"
+                onClick={() => {
+                  setSearchParams("action=add");
+                }}
+              />
+            </div>
           </div>
           <ul className="flex bg-zinc-100 shadow-inner p-2 gap-2">
             {tabs.map((t) => (
@@ -49,6 +58,7 @@ function ProductRoute() {
         <OrderPreview />
       </div>
       {action === "add" ? <AddProductModal /> : undefined}
+      {action === "edit" ? <ProductListModal /> : undefined}
     </main>
   );
 }
