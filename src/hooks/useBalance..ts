@@ -5,20 +5,21 @@ import { getConversationKey } from "nostr-tools/nip44";
 import { Proof } from "@cashu/cashu-ts";
 
 const useBalance = () => {
-  const [balance, setBalance] = useState(0);
+  const [proofs, setProofs] = useState<Proof[]>([]);
 
   useEffect(() => {
+    setProofs([]);
     const sk = getSecretKey();
     const pk = getPublicKey(sk);
     const convKey = getConversationKey(sk, pk);
     async function eventHandler(e: Event) {
       const decrypted = nip44.decrypt(e.content, convKey);
       const parsed = JSON.parse(decrypted);
-      const amount = parsed.proofs.reduce(
-        (a: number, c: Proof) => a + c.amount,
-        0,
-      );
-      setBalance((p) => p + amount);
+      console.log(parsed);
+      if (!parsed.proofs) {
+        return;
+      }
+      setProofs((p) => [...p, ...parsed.proofs]);
     }
     const sub = pool.subscribeMany(
       relays,
@@ -30,7 +31,7 @@ const useBalance = () => {
     };
   }, []);
 
-  return balance;
+  return proofs;
 };
 
 export default useBalance;
