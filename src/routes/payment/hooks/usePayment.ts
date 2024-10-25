@@ -1,4 +1,3 @@
-import { PaymentRequest } from "@cashu/cashu-ts";
 import { useEffect, useState } from "react";
 import { SubCloser } from "nostr-tools/abstract-pool";
 import { Event } from "nostr-tools";
@@ -10,39 +9,71 @@ import {
 import { isValidPaymentRequestPayload } from "../../../utils/cashu";
 import { clearBasket } from "../../../store/basket";
 import { useDispatch } from "react-redux";
+import { useAppSelector } from "../../../store/store";
+import { CashuMint, CashuWallet } from "@cashu/cashu-ts";
 
-const usePayment = (paymentRequest?: PaymentRequest) => {
+const usePayment = () => {
   const [isPaid, setIsPaid] = useState(false);
+  const [isLightning, setIsLightning] = useState(false);
+  const order = useAppSelector((state) => state.orders.activeOrder);
+  const paymentRequest = order?.paymentRequest;
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     let sub: SubCloser;
-    console.log(paymentRequest);
-    if (paymentRequest) {
-      async function eventHandler(e: Event) {
-        const parsedPayment = unwrapPaymentRequestPayload(e);
-        const isValid = isValidPaymentRequestPayload(
-          parsedPayment,
-          paymentRequest!,
-        );
-        if (!isValid) {
+    let interval: number;
+    function handlePaid(cleanUp: () => void) {
+      setIsPaid(true);
+      dispatch(clearBasket());
+      cleanUp();
+    }
+
+    if (paymentRequest && isLightning) {
+      async function checkPayment() {
+        console.log("interval runs");
+        if (!paymentRequest || !paymentRequest.mints?.length) {
           return;
         }
-        const res = await sackProofs(parsedPayment.mint, parsedPayment.proofs);
-        console.log(res);
-        setIsPaid(true);
-        dispatch(clearBasket());
+        const wallet = new CashuWallet(new CashuMint(paymentRequest.mints[0]));
+        const { state } = await wallet.checkMintQuote(
+          order.lnFallback!.quoteId,
+        );
+        if (state === "PAID") {
+          handlePaid(() => {
+            clearInterval(interval);
+          });
+        }
       }
-      sub = createPaymentSubscription(eventHandler);
+      interval = setInterval(checkPayment, 2500);
+    } else {
+      if (paymentRequest) {
+        async function eventHandler(e: Event) {
+          const parsedPayment = unwrapPaymentRequestPayload(e);
+          const isValid = isValidPaymentRequestPayload(
+            parsedPayment,
+            paymentRequest!,
+          );
+          if (!isValid) {
+            return;
+          }
+          await sackProofs(parsedPayment.mint, parsedPayment.proofs);
+          handlePaid(() => {
+            sub.close();
+          });
+        }
+        sub = createPaymentSubscription(eventHandler);
+      }
     }
     return () => {
       if (sub) {
         sub.close();
       }
+      console.log("Clearing interval...");
+      clearInterval(interval);
     };
-  }, [paymentRequest]);
-  return { isPaid };
+  }, [paymentRequest, isLightning]);
+  return { isPaid, isLightning, setIsLightning };
 };
 
 export default usePayment;
