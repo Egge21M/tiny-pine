@@ -19,12 +19,18 @@ export const productsSlice = createSlice({
       }
       state.products[action.payload.id] = action.payload;
     },
+    deleteItem: (state, action: PayloadAction<string>) => {
+      if (!state.products[action.payload]) {
+        return;
+      }
+      delete state.products[action.payload];
+    },
     rehydrate: (state, action: PayloadAction<ProductsState>) => {
       state.products = action.payload.products;
     },
   },
 });
 
-export const { addItem, rehydrate } = productsSlice.actions;
+export const { addItem, rehydrate, deleteItem } = productsSlice.actions;
 
 export default productsSlice.reducer;
