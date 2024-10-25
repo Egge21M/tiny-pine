@@ -31,15 +31,20 @@ const usePayment = () => {
 
     if (paymentRequest && isLightning) {
       async function checkPayment() {
-        console.log("interval runs");
         if (!paymentRequest || !paymentRequest.mints?.length) {
           return;
         }
-        const wallet = new CashuWallet(new CashuMint(paymentRequest.mints[0]));
+        const mint = paymentRequest.mints[0];
+        const wallet = new CashuWallet(new CashuMint(mint));
         const { state } = await wallet.checkMintQuote(
           order.lnFallback!.quoteId,
         );
         if (state === "PAID") {
+          const { proofs } = await wallet.mintTokens(
+            paymentRequest.amount!,
+            order.lnFallback.quoteId,
+          );
+          await sackProofs(mint, proofs);
           handlePaid(() => {
             clearInterval(interval);
           });

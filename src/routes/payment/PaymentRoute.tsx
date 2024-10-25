@@ -1,4 +1,3 @@
-import QRCode from "react-qr-code";
 import usePayment from "./hooks/usePayment";
 import Confetti from "react-confetti";
 import { FaCheckCircle } from "react-icons/fa";

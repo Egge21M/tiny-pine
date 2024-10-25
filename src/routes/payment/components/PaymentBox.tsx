@@ -38,7 +38,7 @@ function PaymentBox({ setIsLightning, isLightning }: PaymentBoxProps) {
       </div>
       <div className="flex w-full ">
         <button
-          className={`${isLightning ? "bg-zinc-300" : "bg-zinc-400"} grow transition duration-500 flex-1 flex items-center justify-center rounded-s px-2 py-1`}
+          className={`${isLightning ? "bg-zinc-300" : "bg-zinc-400"} grow transition duration-500 flex-1 flex items-center justify-center rounded-s p-2 `}
           onClick={() => {
             if (!isLightning) {
               return;
@@ -55,7 +55,7 @@ function PaymentBox({ setIsLightning, isLightning }: PaymentBoxProps) {
           />
         </button>
         <button
-          className={`${isLightning ? "bg-zinc-400" : "bg-zinc-300"} grow transition duration-500 flex-1 flex items-center justify-center rounded-e px-2 py-1`}
+          className={`${isLightning ? "bg-zinc-400" : "bg-zinc-300"} grow transition duration-500 flex-1 flex items-center justify-center rounded-e p-2`}
           onClick={() => {
             if (isLightning) {
               return;
